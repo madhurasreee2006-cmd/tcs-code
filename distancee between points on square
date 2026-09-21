@@ -1,0 +1,86 @@
+import java.util.*;
+
+class Main {
+
+    public static int maxDistance(int side, int[][] points, int k) {
+        
+        long[] a = new long[points.length];
+
+        for (int i = 0; i < points.length; i++) {
+            int x = points[i][0];
+            int y = points[i][1];
+
+            if (x == 0)
+                a[i] = y;
+            else if (y == side)
+                a[i] = side + x;
+            else if (x == side)
+                a[i] = 3L * side - y;
+            else
+                a[i] = 4L * side - x;
+        }
+
+        Arrays.sort(a);
+
+        long left = 0, right = side;
+
+        while (left < right) {
+            long mid = (left + right + 1) / 2;
+
+            if (check(a, side, k, mid))
+                left = mid;
+            else
+                right = mid - 1;
+        }
+
+        return (int) left;
+    }
+
+    static boolean check(long[] a, int side, int k, long d) {
+
+        long perimeter = 4L * side;
+        int n = a.length;
+
+        for (int s = 0; s < n; s++) {
+
+            long start = a[s];
+            long last = start;
+            int count = 1;
+
+            for (int j = 1; j < n && count < k; j++) {
+
+                int index = (s + j) % n;
+                long cur = a[index];
+
+                if (index <= s)
+                    cur += perimeter;
+
+                if (cur - last >= d) {
+                    last = cur;
+                    count++;
+                }
+            }
+
+            if (count == k && perimeter - (last - start) >= d)
+                return true;
+        }
+
+        return false;
+    }
+
+    public static void main(String[] args) {
+
+        int side = 2;
+
+        int[][] points = {
+            {0, 2},
+            {2, 0},
+            {2, 2},
+            {0, 0}
+        };
+
+        int k = 4;
+
+        System.out.println(maxDistance(side, points, k));
+    }
+}
